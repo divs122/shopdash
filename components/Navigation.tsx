@@ -4,9 +4,19 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { 
+  Bars3Icon, 
+  XMarkIcon,
+  SunIcon,
+  MoonIcon 
+} from '@heroicons/react/24/outline'
 
-export function Navigation() {
+interface NavigationProps {
+  darkMode: boolean;
+  setDarkMode: (value: boolean) => void;
+}
+
+export function Navigation({ darkMode, setDarkMode }: NavigationProps) {
   const pathname = usePathname()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -19,8 +29,6 @@ export function Navigation() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const isActive = (path: string) => pathname === path
-
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/examples', label: 'Our Work' },
@@ -29,12 +37,16 @@ export function Navigation() {
     { href: '/contact', label: 'Contact' },
   ]
 
+  const isActive = (path: string) => pathname === path
+
   return (
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       className={`fixed w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white/80 backdrop-blur-md shadow-soft' : 'bg-transparent'
+        isScrolled 
+          ? 'bg-secondary-900/80 backdrop-blur-lg shadow-lg border-b border-white/10' 
+          : 'bg-transparent'
       }`}
     >
       <div className="container">
@@ -46,16 +58,14 @@ export function Navigation() {
           >
             <Link 
               href="/" 
-              className={`text-2xl font-bold ${
-                isScrolled ? 'text-primary-600' : 'text-white'
-              }`}
+              className="text-2xl font-bold gradient-text"
             >
               SHOPDASH
             </Link>
           </motion.div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-8">
+          <div className="hidden md:flex items-center space-x-8">
             {navLinks.map((link, index) => (
               <motion.div
                 key={link.href}
@@ -65,41 +75,52 @@ export function Navigation() {
               >
                 <Link
                   href={link.href}
-                  className={`relative px-1 py-2 transition-colors ${
-                    isScrolled
-                      ? isActive(link.href)
-                        ? 'text-primary-600'
-                        : 'text-gray-600 hover:text-primary-600'
-                      : isActive(link.href)
-                      ? 'text-white'
-                      : 'text-white/80 hover:text-white'
+                  className={`nav-link ${
+                    isActive(link.href) ? 'text-primary-400 after:w-full' : ''
                   }`}
                 >
                   {link.label}
-                  {isActive(link.href) && (
-                    <motion.div
-                      layoutId="underline"
-                      className={`absolute left-0 right-0 h-0.5 ${
-                        isScrolled ? 'bg-primary-600' : 'bg-white'
-                      }`}
-                      style={{ bottom: '-2px' }}
-                    />
-                  )}
                 </Link>
               </motion.div>
             ))}
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setDarkMode(!darkMode)}
+              className="p-2 rounded-full bg-white/5 backdrop-blur-lg border border-white/10 hover:bg-white/10 transition-colors"
+            >
+              {darkMode ? (
+                <SunIcon className="w-5 h-5 text-yellow-400" />
+              ) : (
+                <MoonIcon className="w-5 h-5 text-gray-400" />
+              )}
+            </motion.button>
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden">
+          <div className="md:hidden flex items-center gap-4">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setDarkMode(!darkMode)}
+              className="p-2 rounded-full bg-white/5 backdrop-blur-lg border border-white/10 hover:bg-white/10 transition-colors"
+            >
+              {darkMode ? (
+                <SunIcon className="w-5 h-5 text-yellow-400" />
+              ) : (
+                <MoonIcon className="w-5 h-5 text-gray-400" />
+              )}
+            </motion.button>
+            
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className={`p-2 ${isScrolled ? 'text-gray-600' : 'text-white'}`}
+              className="p-2 rounded-lg bg-white/5 backdrop-blur-lg border border-white/10 hover:bg-white/10 transition-colors"
             >
               {isMobileMenuOpen ? (
-                <XMarkIcon className="h-6 w-6" />
+                <XMarkIcon className="h-6 w-6 text-gray-300" />
               ) : (
-                <Bars3Icon className="h-6 w-6" />
+                <Bars3Icon className="h-6 w-6 text-gray-300" />
               )}
             </button>
           </div>
@@ -113,7 +134,7 @@ export function Navigation() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white border-t"
+            className="md:hidden bg-secondary-900/95 backdrop-blur-lg border-t border-white/10"
           >
             <div className="container py-4">
               <div className="flex flex-col space-y-4">
@@ -124,8 +145,8 @@ export function Navigation() {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={`px-4 py-2 rounded-lg transition-colors ${
                       isActive(link.href)
-                        ? 'bg-primary-50 text-primary-600'
-                        : 'text-gray-600 hover:bg-gray-50'
+                        ? 'bg-primary-500/10 text-primary-400'
+                        : 'text-gray-300 hover:bg-white/5'
                     }`}
                   >
                     {link.label}
